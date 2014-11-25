@@ -30,7 +30,7 @@ exports.types = [
   'EVENT',
   'ACK',
   'ERROR'
-	'BINARY_EVENT',
+  'BINARY_EVENT',
   'BINARY_ACK',
 ];
 

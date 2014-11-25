@@ -29,9 +29,9 @@ exports.types = [
   'DISCONNECT',
   'EVENT',
   'ACK',
-  'ERROR'
+  'ERROR',
   'BINARY_EVENT',
-  'BINARY_ACK',
+  'BINARY_ACK'
 ];
 
 /**

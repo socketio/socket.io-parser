@@ -59,28 +59,12 @@ exports.DISCONNECT = 1;
 exports.EVENT = 2;
 
 /**
- * Packet type 'binary event'
- *
- * @api public
- */
-
-exports.BINARY_EVENT = 3;
-
-/**
  * Packet type `ack`.
  *
  * @api public
  */
 
-exports.ACK = 4;
-
-/**
- * Packet type `binary ack`. For acks with binary arguments.
- *
- * @api public
- */
-
-exports.BINARY_ACK = 5;
+exports.ACK = 3;
 
 /**
  * Packet type `error`.
@@ -88,7 +72,23 @@ exports.BINARY_ACK = 5;
  * @api public
  */
 
-exports.ERROR = 6;
+exports.ERROR = 4;
+
+/**
+ * Packet type 'binary event'
+ *
+ * @api public
+ */
+
+exports.BINARY_EVENT = 5;
+
+/**
+ * Packet type `binary ack`. For acks with binary arguments.
+ *
+ * @api public
+ */
+
+exports.BINARY_ACK = 6;
 
 /**
  * Encoder constructor.

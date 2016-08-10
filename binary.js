@@ -4,7 +4,6 @@
  * Module requirements
  */
 
-var isArray = require('isarray');
 var isBuf = require('./is-buffer');
 
 /**
@@ -28,7 +27,7 @@ exports.deconstructPacket = function(packet){
       var placeholder = { _placeholder: true, num: buffers.length };
       buffers.push(data);
       return placeholder;
-    } else if (isArray(data)) {
+    } else if (Array.isArray(data)) {
       var newData = new Array(data.length);
       for (var i = 0; i < data.length; i++) {
         newData[i] = _deconstructPacket(data[i]);

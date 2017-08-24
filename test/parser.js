@@ -1,8 +1,6 @@
 var parser = require('../index.js');
 var expect = require('expect.js');
 var helpers = require('./helpers.js');
-var encode = parser.encode;
-var decode = parser.decode;
 
 describe('parser', function(){
 
@@ -56,6 +54,15 @@ describe('parser', function(){
       var decoder = new parser.Decoder();
       decoder.add('5');
     } catch(e){
+      expect(e.message).to.match(/Illegal/);
+    }
+  });
+
+  it('should throw when decoding an invalid packet', function(){
+    try {
+      var decoder = new parser.Decoder();
+      decoder.add('442["some","data","that","breaks","stuff"]');
+    } catch (e) {
       expect(e.message).to.match(/Illegal/);
     }
   });

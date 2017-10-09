@@ -89,6 +89,23 @@ exports.BINARY_EVENT = 5;
 
 exports.BINARY_ACK = 6;
 
+
+
+//Provide two functions for users to register some operations before encode or after decode. The operation can be such as recording log.
+var beforeEncode = function () {};
+var afterDecode = function () {};
+
+exports.setBeforeEncode = function (fun) {
+  if(typeof fun === 'function') {
+    beforeEncode = fun;
+  }
+};
+exports.setAfterDecode = function (fun) {
+  if(typeof fun === 'function') {
+    afterDecode = fun;
+  }
+};
+
 /**
  * Encoder constructor.
  *
@@ -124,6 +141,10 @@ function Encoder() {}
  */
 
 Encoder.prototype.encode = function(obj, callback){
+
+  //do operation before encode
+  beforeEncode(obj);
+
   if ((obj.type === exports.EVENT || obj.type === exports.ACK) && hasBin(obj.data)) {
     obj.type = obj.type === exports.EVENT ? exports.BINARY_EVENT : exports.BINARY_ACK;
   }
@@ -219,7 +240,7 @@ function Decoder() {
 Emitter(Decoder.prototype);
 
 /**
- * Decodes an ecoded packet string into packet JSON.
+ * Decodes an encoded packet string into packet JSON.
  *
  * @param {String} obj - encoded packet
  * @return {Object} packet
@@ -227,6 +248,14 @@ Emitter(Decoder.prototype);
  */
 
 Decoder.prototype.add = function(obj) {
+
+  this._callbacks = this._callbacks || {};
+  var callbacks = this._callbacks['$decoded'];
+  if(!callbacks || !~callbacks.indexOf(afterDecode)){
+    //listen decoded event, get decoded data that can be used directly
+    this.on('decoded', afterDecode);
+  }
+
   var packet;
   if (typeof obj === 'string') {
     packet = decodeString(obj);

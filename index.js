@@ -132,8 +132,7 @@ Encoder.prototype.encode = function(obj, callback){
 
   if (exports.BINARY_EVENT === obj.type || exports.BINARY_ACK === obj.type) {
     encodeAsBinary(obj, callback);
-  }
-  else {
+  } else {
     var encoding = encodeAsString(obj);
     callback([encoding]);
   }
@@ -170,7 +169,11 @@ function encodeAsString(obj) {
 
   // json data
   if (null != obj.data) {
-    str += JSON.stringify(obj.data);
+    try {
+      str += JSON.stringify(obj.data);
+    } catch (error) {
+      return error();      
+    }
   }
 
   debug('encoded %j as %s', obj, str);

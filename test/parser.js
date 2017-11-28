@@ -51,6 +51,18 @@ describe('parser', function(){
     });
   });
 
+  it('encodes a circular object (return error)', function() {
+    var john = new Object();  
+    var mary = new Object();  
+    john.sister = mary;  
+    mary.brother = john;
+
+    var encoder = new parser.Encoder();
+    encode.encode(john, function(encodedPackets) {
+      expect(encodedPackets[0].type).to.be(parser.ERROR);
+    });
+  });
+
   it('decodes a bad binary packet', function(){
     try {
       var decoder = new parser.Decoder();

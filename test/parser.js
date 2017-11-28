@@ -58,7 +58,7 @@ describe('parser', function(){
     mary.brother = john;
 
     var encoder = new parser.Encoder();
-    encode.encode(john, function(encodedPackets) {
+    encoder.encode(john, function(encodedPackets) {
       expect(encodedPackets[0].type).to.be(parser.ERROR);
     });
   });

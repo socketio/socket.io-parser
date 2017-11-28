@@ -124,18 +124,31 @@ function Encoder() {}
  */
 
 Encoder.prototype.encode = function(obj, callback){
-  if ((obj.type === exports.EVENT || obj.type === exports.ACK) && hasBin(obj.data)) {
-    obj.type = obj.type === exports.EVENT ? exports.BINARY_EVENT : exports.BINARY_ACK;
+
+  /**
+   * For object data with circular references, hasBin will throw
+   * exceptions, which must be handled or it could hang the channel.
+   * And the circular references only happen to non-Binary data, 
+   * so we will invoke callback with an array.
+   */
+  try {
+    var hasBinary = hasBin(obj.data);
+  } catch (e) {
+    callback([JSON.stringify(error('encode error'))]);
   }
 
-  debug('encoding packet %j', obj);
+  if ((obj.type === exports.EVENT || obj.type === exports.ACK) && hasBinary) {
+    obj.type = obj.type === exports.EVENT ? exports.BINARY_EVENT : exports.BINARY_ACK;
+  }    
 
+  debug('encoding packet %j', obj);
+    
   if (exports.BINARY_EVENT === obj.type || exports.BINARY_ACK === obj.type) {
     encodeAsBinary(obj, callback);
   } else {
     var encoding = encodeAsString(obj);
     callback([encoding]);
-  }
+  }    
 };
 
 /**
@@ -172,7 +185,7 @@ function encodeAsString(obj) {
     try {
       str += JSON.stringify(obj.data);
     } catch (e) {
-      return error();      
+      return JSON.stringify(error('encode error'));
     }
   }
 
@@ -395,9 +408,9 @@ BinaryReconstructor.prototype.finishedReconstruction = function() {
   this.buffers = [];
 };
 
-function error() {
+function error(message) {
   return {
     type: exports.ERROR,
-    data: 'parser error'
+    data: message || 'parser error'
   };
 }

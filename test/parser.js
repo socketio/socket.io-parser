@@ -1,8 +1,6 @@
 var parser = require('../index.js');
 var expect = require('expect.js');
 var helpers = require('./helpers.js');
-var encode = parser.encode;
-var decode = parser.decode;
 
 describe('parser', function(){
 
@@ -52,12 +50,24 @@ describe('parser', function(){
   });
 
   it('encodes a circular object (return error)', function() {
-    var arr = [];
-    arr[90000000] = "STR";
+    var john = new Object();  
+    var mary = new Object();  
+    
+    john.sister = mary;  
+    mary.brother = john;  
 
+    var data = {
+      type: parser.EVENT,
+      data: john,
+      id: 1,
+      nsp: '/'
+    }
+
+    var error = JSON.stringify({ type: parser.ERROR, data: 'encode error' });
     var encoder = new parser.Encoder();
-    encoder.encode(arr, function(encodedPackets) {
-      expect(encodedPackets[0].type).to.be(parser.ERROR);
+
+    encoder.encode(data, function(encodedPackets) {
+      expect(encodedPackets[0]).to.be(error);
     });
   });
 

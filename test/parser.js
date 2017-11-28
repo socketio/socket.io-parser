@@ -63,7 +63,7 @@ describe('parser', function(){
       nsp: '/'
     }
 
-    var error = JSON.stringify({ type: parser.ERROR, data: 'encode error' });
+    var error = parser.ERROR + JSON.stringify('encode error');
     var encoder = new parser.Encoder();
 
     encoder.encode(data, function(encodedPackets) {

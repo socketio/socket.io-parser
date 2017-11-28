@@ -134,7 +134,7 @@ Encoder.prototype.encode = function(obj, callback){
   try {
     var hasBinary = hasBin(obj.data);
   } catch (e) {
-    callback([JSON.stringify(error('encode error'))]);
+    callback([encodeError()]);
   }
 
   if ((obj.type === exports.EVENT || obj.type === exports.ACK) && hasBinary) {
@@ -185,7 +185,7 @@ function encodeAsString(obj) {
     try {
       str += JSON.stringify(obj.data);
     } catch (e) {
-      return JSON.stringify(error('encode error'));
+      return encodeError();
     }
   }
 
@@ -408,9 +408,13 @@ BinaryReconstructor.prototype.finishedReconstruction = function() {
   this.buffers = [];
 };
 
-function error(message) {
+function error() {
   return {
     type: exports.ERROR,
-    data: message || 'parser error'
+    data: 'parser error'
   };
+}
+
+function encodeError() {
+  return exports.ERROR + JSON.stringify('encode error');
 }

@@ -171,7 +171,7 @@ function encodeAsString(obj) {
   if (null != obj.data) {
     try {
       str += JSON.stringify(obj.data);
-    } catch (error) {
+    } catch (e) {
       return error();      
     }
   }

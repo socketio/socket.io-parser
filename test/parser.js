@@ -52,13 +52,11 @@ describe('parser', function(){
   });
 
   it('encodes a circular object (return error)', function() {
-    var john = new Object();  
-    var mary = new Object();  
-    john.sister = mary;  
-    mary.brother = john;
+    var arr = [];
+    arr[90000000] = "STR";
 
     var encoder = new parser.Encoder();
-    encoder.encode(john, function(encodedPackets) {
+    encoder.encode(arr, function(encodedPackets) {
       expect(encodedPackets[0].type).to.be(parser.ERROR);
     });
   });

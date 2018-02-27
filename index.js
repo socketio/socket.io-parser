@@ -125,20 +125,20 @@ function Encoder() {}
 
 Encoder.prototype.encode = function(obj, callback){
 
-  /**
-   * For object data with circular references, hasBin will throw
-   * exceptions, which must be handled or it could hang the channel.
-   * And the circular references only happen to non-Binary data, 
-   * so we will invoke callback with an array.
-   */
-  try {
-    var hasBinary = hasBin(obj.data);
-  } catch (e) {
-    callback([encodeError()]);
-  }
-
-  if ((obj.type === exports.EVENT || obj.type === exports.ACK) && hasBinary) {
-    obj.type = obj.type === exports.EVENT ? exports.BINARY_EVENT : exports.BINARY_ACK;
+  if (obj.type === exports.EVENT || obj.type === exports.ACK) {
+    /**
+     * For object data with circular references, hasBin will throw
+     * exceptions, which must be handled or it could hang the channel.
+     * And the circular references only happen to non-Binary data, 
+     * so we will invoke callback with an array.
+     */
+    try {
+      if (hasBin(obj.data)) {
+        obj.type = obj.type === exports.EVENT ? exports.BINARY_EVENT : exports.BINARY_ACK;
+      }
+    } catch (e) {
+      callback([encodeError()]);
+    }
   }    
 
   debug('encoding packet %j', obj);

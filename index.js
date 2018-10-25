@@ -250,8 +250,7 @@ Decoder.prototype.add = function(obj) {
     } else { // non-binary full packet
       this.emit('decoded', packet);
     }
-  }
-  else if (isBuf(obj) || obj.base64) { // raw binary data
+  } else if (isBuf(obj) || obj.base64) { // raw binary data
     if (!this.reconstructor) {
       throw new Error('got binary data when not reconstructing a packet');
     } else {
@@ -261,8 +260,7 @@ Decoder.prototype.add = function(obj) {
         this.emit('decoded', packet);
       }
     }
-  }
-  else {
+  } else {
     throw new Error('Unknown type: ' + obj);
   }
 };

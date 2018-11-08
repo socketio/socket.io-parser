@@ -5,6 +5,12 @@ var encoder = new parser.Encoder();
 // tests encoding and decoding a single packet
 module.exports.test = function(obj){
   encoder.encode(obj, function(encodedPackets) {
+    expect(encodedPackets).to.be.a('array');
+
+    for (var i = 0; i < encodedPackets.length; i++) {
+      expect(encodedPackets[i]).to.be.a('string');
+    }
+
     var decoder = new parser.Decoder();
     decoder.on('decoded', function(packet) {
       expect(packet).to.eql(obj);

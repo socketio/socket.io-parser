@@ -75,7 +75,7 @@ describe('parser', function(){
     var encoder = new parser.Encoder();
 
     encoder.encode(data, function(encodedPackets) {
-      expect(encodedPackets[0]).to.be('4"encode error"');
+      expect(encodedPackets[0]).to.be(parser.ERROR + '"encode error"');
     });
   });
 
@@ -86,6 +86,19 @@ describe('parser', function(){
     } catch(e){
       expect(e.message).to.match(/Illegal/);
     }
+  });
+
+  it('returns an error packet on unknown packet type', function(done) {
+    var badPacketType = 9;
+
+    var decoder = new parser.Decoder();
+    
+    decoder.on('decoded', function(packet) {
+      expect(packet).to.eql({ type: parser.ERROR, data: 'parser error: unknown packet type ' + badPacketType });
+      done();
+    });
+
+    decoder.add(badPacketType + '1["a",1,{}]');
   });
 
   it('returns an error packet on parsing error', function(done){

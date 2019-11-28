@@ -116,6 +116,13 @@ function Encoder() {}
 var ERROR_PACKET = exports.ERROR + '"encode error"';
 
 /**
+ * Store extra response from Socket.io packet.
+ *
+ * @type {string}
+ */
+exports.extraMessageResponse = '';
+
+/**
  * Encode a packet as a single string if non-binary, or as a
  * buffer sequence, depending on packet type.
  *
@@ -248,6 +255,12 @@ Decoder.prototype.add = function(obj) {
         this.emit('decoded', packet);
       }
     } else { // non-binary full packet
+      if (typeof packet.data !== 'undefined') {
+        let extraMessageResponse = typeof Object.entries(packet.data)[2] !== 'undefined' ? Object.entries(packet.data)[2] : {};
+        if (typeof Object.values(extraMessageResponse)[1] === 'string') {
+          exports.extraMessageResponse = Object.values(extraMessageResponse)[1];
+        }
+      }
       this.emit('decoded', packet);
     }
   } else if (isBuf(obj) || obj.base64) { // raw binary data

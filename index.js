@@ -116,6 +116,13 @@ function Encoder() {}
 var ERROR_PACKET = exports.ERROR + '"encode error"';
 
 /**
+ * Store extra response from Socket.io packet.
+ *
+ * @type {string}
+ */
+exports.extraMessageResponse = '';
+
+/**
  * Encode a packet as a single string if non-binary, or as a
  * buffer sequence, depending on packet type.
  *
@@ -240,6 +247,12 @@ Decoder.prototype.add = function(obj) {
   var packet;
   if (typeof obj === 'string') {
     packet = decodeString(obj);
+    if (typeof packet.data !== 'undefined') {
+      var extraMessageResponse = typeof Object.entries(packet.data)[2] !== 'undefined' ? Object.entries(packet.data)[2] : {};
+      if (typeof Object.values(extraMessageResponse)[1] === 'string') {
+        exports.extraMessageResponse = Object.values(extraMessageResponse)[1];
+      }
+    }
     if (exports.BINARY_EVENT === packet.type || exports.BINARY_ACK === packet.type) { // binary packet's json
       this.reconstructor = new BinaryReconstructor(packet);
 

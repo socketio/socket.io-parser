@@ -313,17 +313,16 @@ function decodeString(str) {
   // look up id
   var next = str.charAt(i + 1);
   if ('' !== next && Number(next) == next) {
-    p.id = '';
+    var start = i + 1;
     while (++i) {
       var c = str.charAt(i);
       if (null == c || Number(c) != c) {
         --i;
         break;
       }
-      p.id += str.charAt(i);
       if (i === str.length) break;
     }
-    p.id = Number(p.id);
+    p.id = Number(str.substring(start, i + 1));
   }
 
   // look up json data

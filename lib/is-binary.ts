@@ -15,6 +15,8 @@ const withNativeFile =
   typeof File === "function" ||
   (typeof File !== "undefined" &&
     toString.call(File) === "[object FileConstructor]");
+const withNativeBuffer =
+  typeof Buffer === "function" && typeof Buffer.isBuffer === "function";
 
 /**
  * Returns true if obj is a Buffer, an ArrayBuffer, a Blob or a File.
@@ -26,7 +28,8 @@ export function isBinary(obj: any) {
   return (
     (withNativeArrayBuffer && (obj instanceof ArrayBuffer || isView(obj))) ||
     (withNativeBlob && obj instanceof Blob) ||
-    (withNativeFile && obj instanceof File)
+    (withNativeFile && obj instanceof File) ||
+    (withNativeBuffer && Buffer.isBuffer(obj))
   );
 }
 

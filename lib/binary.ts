@@ -17,24 +17,34 @@ export function deconstructPacket(packet) {
   return { packet: pack, buffers: buffers };
 }
 
-function _deconstructPacket(data, buffers) {
+function _deconstructPacket(
+  data,
+  buffers: Array<any>,
+  known: object[] = [],
+  retVals: WeakMap<any, object> = new WeakMap()
+) {
   if (!data) return data;
 
   if (isBinary(data)) {
     const placeholder = { _placeholder: true, num: buffers.length };
     buffers.push(data);
     return placeholder;
+  } else if (retVals.has(data)) {
+    return retVals.get(data);
+  } else if (known.includes(data)) {
+    return data;
   } else if (Array.isArray(data)) {
     const newData = new Array(data.length);
     for (let i = 0; i < data.length; i++) {
-      newData[i] = _deconstructPacket(data[i], buffers);
+      newData[i] = _deconstructPacket(data[i], buffers, known, retVals);
     }
     return newData;
   } else if (typeof data === "object" && !(data instanceof Date)) {
     const newData = {};
+    retVals.set(data, newData);
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        newData[key] = _deconstructPacket(data[key], buffers);
+        newData[key] = _deconstructPacket(data[key], buffers, known, retVals);
       }
     }
     return newData;

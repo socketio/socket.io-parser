@@ -82,7 +82,7 @@ describe("socket.io-parser", () => {
     });
   });
 
-  it("throws an error when encoding circular objects", () => {
+  it("does not throw an error when encoding circular objects", () => {
     const a = {};
     a.b = a;
 
@@ -95,7 +95,7 @@ describe("socket.io-parser", () => {
 
     const encoder = new Encoder();
 
-    expect(() => encoder.encode(data)).to.throwException();
+    expect(() => encoder.encode(data)).not.to.throwException();
   });
 
   it("decodes a bad binary packet", () => {
@@ -126,5 +126,29 @@ describe("socket.io-parser", () => {
     expect(() => new Decoder().add(999)).to.throwException(
       /^Unknown type: 999$/
     );
+  });
+
+  it("correctly encodes and decodes circular data in array", (done) => {
+    const circularObj = {};
+
+    circularObj.circularArray = [circularObj, circularObj];
+
+    const obj = {
+      type: PacketType.EVENT,
+      data: ["a", circularObj],
+      id: 1,
+      nsp: "/",
+    };
+
+    const encoder = new Encoder();
+    const decoder = new Decoder();
+
+    decoder.on("decoded", (packet) => {
+      expect(packet.data[1] === packet.data[1].circularArray[0]).to.be.true;
+      expect(packet.data[1] === packet.data[1].circularArray[1]).to.be.true;
+      done();
+    });
+
+    encoder.encode(obj).forEach((packet) => decoder.add(packet));
   });
 });

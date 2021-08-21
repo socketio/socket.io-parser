@@ -51,13 +51,13 @@ function _deconstructPacket(data, buffers) {
  * @public
  */
 
-export function reconstructPacket(packet, buffers) {
+export function reconstructPacket(packet, buffers: Array<any>) {
   packet.data = _reconstructPacket(packet.data, buffers);
   packet.attachments = undefined; // no longer useful
   return packet;
 }
 
-function _reconstructPacket(data, buffers) {
+function _reconstructPacket(data, buffers: Array<any>) {
   if (!data) return data;
 
   if (data && data._placeholder === true) {

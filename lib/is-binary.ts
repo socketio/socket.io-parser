@@ -33,14 +33,16 @@ export function isBinary(obj: any) {
   );
 }
 
-export function hasBinary(obj: any, toJSON?: boolean) {
-  if (!obj || typeof obj !== "object") {
+export function hasBinary(obj: any, known: object[] = [], toJSON?: boolean) {
+  if (!obj || typeof obj !== "object" || known.includes(obj)) {
     return false;
   }
 
+  known.push(obj);
+
   if (Array.isArray(obj)) {
     for (let i = 0, l = obj.length; i < l; i++) {
-      if (hasBinary(obj[i])) {
+      if (hasBinary(obj[i], known)) {
         return true;
       }
     }
@@ -51,16 +53,15 @@ export function hasBinary(obj: any, toJSON?: boolean) {
     return true;
   }
 
-  if (
-    obj.toJSON &&
-    typeof obj.toJSON === "function" &&
-    arguments.length === 1
-  ) {
-    return hasBinary(obj.toJSON(), true);
+  if (obj.toJSON && typeof obj.toJSON === "function" && arguments.length < 3) {
+    return hasBinary(obj.toJSON(), known, true);
   }
 
   for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key) && hasBinary(obj[key])) {
+    if (
+      (Object.prototype.hasOwnProperty.call(obj, key) && hasBinary(obj[key]),
+      known)
+    ) {
       return true;
     }
   }

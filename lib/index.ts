@@ -129,6 +129,9 @@ export class Decoder extends Emitter {
   public add(obj: any) {
     let packet;
     if (typeof obj === "string") {
+      if (this.reconstructor) {
+        throw new Error("got plaintext data when reconstructing a packet");
+      }
       packet = this.decodeString(obj);
       if (
         packet.type === PacketType.BINARY_EVENT ||

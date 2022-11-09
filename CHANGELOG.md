@@ -1,3 +1,12 @@
+## [3.4.2](https://github.com/socketio/socket.io-parser/compare/3.4.1...3.4.2) (2022-11-09)
+
+
+### Bug Fixes
+
+* check the format of the index of each attachment ([04d23ce](https://github.com/socketio/socket.io-parser/commit/04d23cecafe1b859fb03e0cbf6ba3b74dff56d14))
+
+
+
 ## [3.4.1](https://github.com/socketio/socket.io-parser/compare/3.4.0...3.4.1) (2020-05-13)
 
 

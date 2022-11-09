@@ -1,3 +1,12 @@
+## [3.3.3](https://github.com/Automattic/socket.io-parser/compare/3.3.2...3.3.3) (2022-11-09)
+
+
+### Bug Fixes
+
+* check the format of the index of each attachment ([fb21e42](https://github.com/Automattic/socket.io-parser/commit/fb21e422fc193b34347395a33e0f625bebc09983))
+
+
+
 ## [3.3.2](https://github.com/Automattic/socket.io-parser/compare/3.3.1...3.3.2) (2021-01-09)
 
 

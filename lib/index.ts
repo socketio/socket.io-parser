@@ -1,4 +1,5 @@
 import { Emitter } from "@socket.io/component-emitter";
+import { parse, stringify } from "flatted";
 import { deconstructPacket, reconstructPacket } from "./binary.js";
 import { isBinary, hasBinary } from "./is-binary.js";
 import debugModule from "debug"; // debug()
@@ -39,7 +40,7 @@ export class Encoder {
   /**
    * Encoder constructor
    *
-   * @param {function} replacer - custom replacer to pass down to JSON.parse
+   * @param {function} replacer - custom replacer to pass down to JSON.stringify
    */
   constructor(private replacer?: (this: any, key: string, value: any) => any) {}
   /**
@@ -92,7 +93,7 @@ export class Encoder {
 
     // json data
     if (null != obj.data) {
-      str += JSON.stringify(obj.data, this.replacer);
+      str += stringify(obj.data, this.replacer);
     }
 
     debug("encoded %j as %s", obj, str);
@@ -130,7 +131,7 @@ export class Decoder extends Emitter<{}, {}, DecoderReservedEvents> {
   /**
    * Decoder constructor
    *
-   * @param {function} reviver - custom reviver to pass down to JSON.stringify
+   * @param {function} reviver - custom reviver to pass down to JSON.parse
    */
   constructor(private reviver?: (this: any, key: string, value: any) => any) {
     super();
@@ -145,6 +146,9 @@ export class Decoder extends Emitter<{}, {}, DecoderReservedEvents> {
   public add(obj: any) {
     let packet;
     if (typeof obj === "string") {
+      if (this.reconstructor) {
+        throw new Error("got plaintext data when reconstructing a packet");
+      }
       packet = this.decodeString(obj);
       if (
         packet.type === PacketType.BINARY_EVENT ||
@@ -253,7 +257,7 @@ export class Decoder extends Emitter<{}, {}, DecoderReservedEvents> {
 
   private tryParse(str) {
     try {
-      return JSON.parse(str, this.reviver);
+      return parse(str, this.reviver);
     } catch (e) {
       return false;
     }

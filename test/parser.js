@@ -2,7 +2,7 @@ const { PacketType, Decoder, Encoder } = require("..");
 const expect = require("expect.js");
 const helpers = require("./helpers.js");
 
-describe("parser", () => {
+describe("socket.io-parser", () => {
   it("exposes types", () => {
     expect(PacketType.CONNECT).to.be.a("number");
     expect(PacketType.DISCONNECT).to.be.a("number");
@@ -13,100 +13,76 @@ describe("parser", () => {
     expect(PacketType.BINARY_ACK).to.be.a("number");
   });
 
-  it("encodes connection", (done) => {
-    helpers.test(
-      {
-        type: PacketType.CONNECT,
-        nsp: "/woot",
-        data: {
-          token: "123",
-        },
+  it("encodes connection", () => {
+    return helpers.test({
+      type: PacketType.CONNECT,
+      nsp: "/woot",
+      data: {
+        token: "123",
       },
-      done
-    );
+    });
   });
 
-  it("encodes disconnection", (done) => {
-    helpers.test(
-      {
-        type: PacketType.DISCONNECT,
-        nsp: "/woot",
-      },
-      done
-    );
+  it("encodes disconnection", () => {
+    return helpers.test({
+      type: PacketType.DISCONNECT,
+      nsp: "/woot",
+    });
   });
 
-  it("encodes an event", (done) => {
-    helpers.test(
-      {
-        type: PacketType.EVENT,
-        data: ["a", 1, {}],
-        nsp: "/",
-      },
-      done
-    );
+  it("encodes an event", () => {
+    return helpers.test({
+      type: PacketType.EVENT,
+      data: ["a", 1, {}],
+      nsp: "/",
+    });
   });
 
-  it("encodes an event (with an integer as event name)", (done) => {
-    helpers.test(
-      {
-        type: PacketType.EVENT,
-        data: [1, "a", {}],
-        nsp: "/",
-      },
-      done
-    );
+  it("encodes an event (with an integer as event name)", () => {
+    return helpers.test({
+      type: PacketType.EVENT,
+      data: [1, "a", {}],
+      nsp: "/",
+    });
   });
 
-  it("encodes an event (with ack)", (done) => {
-    helpers.test(
-      {
-        type: PacketType.EVENT,
-        data: ["a", 1, {}],
-        id: 1,
-        nsp: "/test",
-      },
-      done
-    );
+  it("encodes an event (with ack)", () => {
+    return helpers.test({
+      type: PacketType.EVENT,
+      data: ["a", 1, {}],
+      id: 1,
+      nsp: "/test",
+    });
   });
 
-  it("encodes an ack", (done) => {
-    helpers.test(
-      {
-        type: PacketType.ACK,
-        data: ["a", 1, {}],
-        id: 123,
-        nsp: "/",
-      },
-      done
-    );
+  it("encodes an ack", () => {
+    return helpers.test({
+      type: PacketType.ACK,
+      data: ["a", 1, {}],
+      id: 123,
+      nsp: "/",
+    });
   });
 
-  it("encodes an connect error", (done) => {
-    helpers.test(
-      {
-        type: PacketType.CONNECT_ERROR,
-        data: "Unauthorized",
-        nsp: "/",
-      },
-      done
-    );
+  it("encodes an connect error", () => {
+    return helpers.test({
+      type: PacketType.CONNECT_ERROR,
+      data: "Unauthorized",
+      nsp: "/",
+    });
   });
 
-  it("encodes an connect error (with object)", (done) => {
-    helpers.test(
-      {
-        type: PacketType.CONNECT_ERROR,
-        data: {
-          message: "Unauthorized",
-        },
-        nsp: "/",
+  it("encodes an connect error (with object)", () => {
+    return helpers.test({
+      type: PacketType.CONNECT_ERROR,
+      data: {
+        message: "Unauthorized",
       },
-      done
-    );
+      nsp: "/",
+    });
   });
 
-  it("throws an error when encoding circular objects", () => {
+  it("does not throw an error when encoding circular objects", () => {
     const a = {};
     a.b = a;
 
@@ -119,7 +95,7 @@ describe("parser", () => {
 
     const encoder = new Encoder();
 
-    expect(() => encoder.encode(data)).to.throwException();
+    expect(() => encoder.encode(data)).not.to.throwException();
   });
 
   it("decodes a bad binary packet", () => {
@@ -146,5 +122,33 @@ describe("parser", () => {
     expect(() => new Decoder().add("999")).to.throwException(
       /^unknown packet type 9$/
     );
+
+    expect(() => new Decoder().add(999)).to.throwException(
+      /^Unknown type: 999$/
+    );
+  });
+
+  it("correctly encodes and decodes circular data in array", (done) => {
+    const circularObj = {};
+
+    circularObj.circularArray = [circularObj, circularObj];
+
+    const obj = {
+      type: PacketType.EVENT,
+      data: ["a", circularObj],
+      id: 1,
+      nsp: "/",
+    };
+
+    const encoder = new Encoder();
+    const decoder = new Decoder();
+
+    decoder.on("decoded", (packet) => {
+      expect(packet.data[1] === packet.data[1].circularArray[0]).to.be.true;
+      expect(packet.data[1] === packet.data[1].circularArray[1]).to.be.true;
+      done();
+    });
+
+    encoder.encode(obj).forEach((packet) => decoder.add(packet));
   });
 });

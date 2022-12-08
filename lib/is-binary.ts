@@ -15,6 +15,8 @@ const withNativeFile =
   typeof File === "function" ||
   (typeof File !== "undefined" &&
     toString.call(File) === "[object FileConstructor]");
+const withNativeBuffer =
+  typeof Buffer === "function" && typeof Buffer.isBuffer === "function";
 
 /**
  * Returns true if obj is a Buffer, an ArrayBuffer, a Blob or a File.
@@ -26,18 +28,21 @@ export function isBinary(obj: any) {
   return (
     (withNativeArrayBuffer && (obj instanceof ArrayBuffer || isView(obj))) ||
     (withNativeBlob && obj instanceof Blob) ||
-    (withNativeFile && obj instanceof File)
+    (withNativeFile && obj instanceof File) ||
+    (withNativeBuffer && Buffer.isBuffer(obj))
   );
 }
 
-export function hasBinary(obj: any, toJSON?: boolean) {
-  if (!obj || typeof obj !== "object") {
+export function hasBinary(obj: any, known: object[] = [], toJSON?: boolean) {
+  if (!obj || typeof obj !== "object" || known.includes(obj)) {
     return false;
   }
 
+  known.push(obj);
+
   if (Array.isArray(obj)) {
     for (let i = 0, l = obj.length; i < l; i++) {
-      if (hasBinary(obj[i])) {
+      if (hasBinary(obj[i], known)) {
         return true;
       }
     }
@@ -48,16 +53,15 @@ export function hasBinary(obj: any, toJSON?: boolean) {
     return true;
   }
 
-  if (
-    obj.toJSON &&
-    typeof obj.toJSON === "function" &&
-    arguments.length === 1
-  ) {
-    return hasBinary(obj.toJSON(), true);
+  if (obj.toJSON && typeof obj.toJSON === "function" && arguments.length < 3) {
+    return hasBinary(obj.toJSON(), known, true);
   }
 
   for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key) && hasBinary(obj[key])) {
+    if (
+      (Object.prototype.hasOwnProperty.call(obj, key) && hasBinary(obj[key]),
+      known)
+    ) {
       return true;
     }
   }

@@ -1,3 +1,12 @@
+## [3.4.3](https://github.com/socketio/socket.io-parser/compare/3.4.2...3.4.3) (2023-05-22)
+
+
+### Bug Fixes
+
+* check the format of the event name ([2dc3c92](https://github.com/socketio/socket.io-parser/commit/2dc3c92622dad113b8676be06f23b1ed46b02ced))
+
+
+
 ## [3.4.2](https://github.com/socketio/socket.io-parser/compare/3.4.1...3.4.2) (2022-11-09)
 
 

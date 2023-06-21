@@ -131,11 +131,6 @@ export class Encoder {
   }
 }
 
-// see https://stackoverflow.com/questions/8511281/check-if-a-value-is-an-object-in-javascript
-function isObject(value: any): boolean {
-  return Object.prototype.toString.call(value) === "[object Object]";
-}
-
 interface DecoderReservedEvents {
   decoded: (packet: Packet) => void;
 }
@@ -262,12 +257,7 @@ export class Decoder extends Emitter<{}, {}, DecoderReservedEvents> {
 
     // look up json data
     if (str.charAt(++i)) {
-      const payload = this.tryParse(str.substr(i));
-      if (Decoder.isPayloadValid(p.type, payload)) {
-        p.data = payload;
-      } else {
-        throw new Error("invalid payload");
-      }
+      p.data = this.tryParse(str.substr(i));
     }
 
     debug("decoded %s as %j", str, p);
@@ -279,28 +269,6 @@ export class Decoder extends Emitter<{}, {}, DecoderReservedEvents> {
       return JSON.parse(str, this.reviver);
     } catch (e) {
       return false;
-    }
-  }
-
-  private static isPayloadValid(type: PacketType, payload: any): boolean {
-    switch (type) {
-      case PacketType.CONNECT:
-        return isObject(payload);
-      case PacketType.DISCONNECT:
-        return payload === undefined;
-      case PacketType.CONNECT_ERROR:
-        return typeof payload === "string" || isObject(payload);
-      case PacketType.EVENT:
-      case PacketType.BINARY_EVENT:
-        return (
-          Array.isArray(payload) &&
-          (typeof payload[0] === "number" ||
-            (typeof payload[0] === "string" &&
-              RESERVED_EVENTS.indexOf(payload[0]) === -1))
-        );
-      case PacketType.ACK:
-      case PacketType.BINARY_ACK:
-        return Array.isArray(payload);
     }
   }
 
@@ -358,4 +326,57 @@ class BinaryReconstructor {
     this.reconPack = null;
     this.buffers = [];
   }
+}
+
+function isNamespaceValid(nsp: unknown) {
+  return typeof nsp === "string";
+}
+
+const isInteger =
+  Number.isInteger ||
+  function (value) {
+    return (
+      typeof value === "number" &&
+      isFinite(value) &&
+      Math.floor(value) === value
+    );
+  };
+
+function isAckIdValid(id: unknown) {
+  return id === undefined || isInteger(id);
+}
+
+// see https://stackoverflow.com/questions/8511281/check-if-a-value-is-an-object-in-javascript
+function isObject(value: any): boolean {
+  return Object.prototype.toString.call(value) === "[object Object]";
+}
+
+function isDataValid(type: PacketType, payload: unknown) {
+  switch (type) {
+    case PacketType.CONNECT:
+      return payload === undefined || isObject(payload);
+    case PacketType.DISCONNECT:
+      return payload === undefined;
+    case PacketType.EVENT:
+      return (
+        Array.isArray(payload) &&
+        (typeof payload[0] === "number" ||
+          (typeof payload[0] === "string" &&
+            RESERVED_EVENTS.indexOf(payload[0]) === -1))
+      );
+    case PacketType.ACK:
+      return Array.isArray(payload);
+    case PacketType.CONNECT_ERROR:
+      return typeof payload === "string" || isObject(payload);
+    default:
+      return false;
+  }
+}
+
+export function isPacketValid(packet: Packet): boolean {
+  return (
+    isNamespaceValid(packet.nsp) &&
+    isAckIdValid(packet.id) &&
+    isDataValid(packet.type, packet.data)
+  );
 }

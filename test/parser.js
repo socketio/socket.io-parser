@@ -1,4 +1,4 @@
-const { PacketType, Decoder, Encoder } = require("..");
+const { PacketType, Decoder, Encoder, isPacketValid } = require("..");
 const expect = require("expect.js");
 const helpers = require("./helpers.js");
 
@@ -108,23 +108,6 @@ describe("socket.io-parser", () => {
   });
 
   it("throw an error upon parsing error", () => {
-    const isInvalidPayload = (str) =>
-      expect(() => new Decoder().add(str)).to.throwException(
-        /^invalid payload$/
-      );
-
-    isInvalidPayload('442["some","data"');
-    isInvalidPayload('0/admin,"invalid"');
-    isInvalidPayload("0[]");
-    isInvalidPayload("1/admin,{}");
-    isInvalidPayload('2/admin,"invalid');
-    isInvalidPayload("2/admin,{}");
-    isInvalidPayload('2[{"toString":"foo"}]');
-    isInvalidPayload('2[true,"foo"]');
-    isInvalidPayload('2[null,"bar"]');
-    isInvalidPayload('2["connect"]');
-    isInvalidPayload('2["disconnect","123"]');
-
     expect(() => new Decoder().add("999")).to.throwException(
       /^unknown packet type 9$/
     );
@@ -147,5 +130,32 @@ describe("socket.io-parser", () => {
       decoder.destroy();
       decoder.add('2["hello"]');
     });
+  });
+
+  it("should ensure that a packet is valid", async () => {
+    function decode(str) {
+      return new Promise((resolve) => {
+        const decoder = new Decoder();
+
+        decoder.on("decoded", (data) => {
+          resolve(data);
+        });
+
+        decoder.add(str);
+      });
+    }
+
+    expect(isPacketValid(await decode("0"))).to.eql(true);
+    expect(isPacketValid(await decode('442["some","data"'))).to.eql(false);
+    expect(isPacketValid(await decode('0/admin,"invalid"'))).to.eql(false);
+    expect(isPacketValid(await decode("0[]"))).to.eql(false);
+    expect(isPacketValid(await decode("1/admin,{}"))).to.eql(false);
+    expect(isPacketValid(await decode('2/admin,"invalid'))).to.eql(false);
+    expect(isPacketValid(await decode("2/admin,{}"))).to.eql(false);
+    expect(isPacketValid(await decode('2[{"toString":"foo"}]'))).to.eql(false);
+    expect(isPacketValid(await decode('2[true,"foo"]'))).to.eql(false);
+    expect(isPacketValid(await decode('2[null,"bar"]'))).to.eql(false);
+    expect(isPacketValid(await decode('2["connect"]'))).to.eql(false);
+    expect(isPacketValid(await decode('2["disconnect","123"]'))).to.eql(false);
   });
 });

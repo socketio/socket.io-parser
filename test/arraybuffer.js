@@ -50,7 +50,7 @@ describe('parser', function() {
   it('cleans itself up on close', function() {
     var packet = {
       type: parser.BINARY_EVENT,
-      data: [new ArrayBuffer(2), new ArrayBuffer(3)],
+      data: ["foo", new ArrayBuffer(2), new ArrayBuffer(3)],
       id: 0,
       nsp: '/'
     };

@@ -7,6 +7,9 @@ A fork of the default socket.io encoder and decoder, which uses
 [devalue](https://github.com/Rich-Harris/devalue) over the vanilla
 [JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON) object,
 for stringifying and parsing JavaScript objects.
+This offers many improvements over the default parser, such as support for
+dates, maps, sets, regular expressions, `undefined`, custom classes and more.
+Check out [devalue](https://github.com/Rich-Harris/devalue) for details.
 
 
 ## Parser API

@@ -113,17 +113,17 @@ describe("socket.io-parser", () => {
         /^invalid payload$/
       );
 
-    isInvalidPayload('442["some","data"');
-    isInvalidPayload('0/admin,"invalid"');
-    isInvalidPayload("0[]");
-    isInvalidPayload("1/admin,{}");
-    isInvalidPayload('2/admin,"invalid');
-    isInvalidPayload("2/admin,{}");
-    isInvalidPayload('2[{"toString":"foo"}]');
-    isInvalidPayload('2[true,"foo"]');
-    isInvalidPayload('2[null,"bar"]');
-    isInvalidPayload('2["connect"]');
-    isInvalidPayload('2["disconnect","123"]');
+    isInvalidPayload('442["some"');
+    isInvalidPayload('0/admin,["invalid"]');
+    isInvalidPayload("0[[]]");
+    isInvalidPayload("1/admin,[{}]");
+    isInvalidPayload('2/admin,["invalid');
+    isInvalidPayload("2/admin,[{}]");
+    isInvalidPayload('2[[1],{"toString":2},"foo"]');
+    isInvalidPayload('2[[1,2],true,"foo"]');
+    isInvalidPayload('2[[1,2],null,"bar"]');
+    isInvalidPayload('2[[1],"connect"]');
+    isInvalidPayload('2[[1,2],"disconnect","123"]');
 
     expect(() => new Decoder().add("999")).to.throwException(
       /^unknown packet type 9$/
@@ -143,9 +143,9 @@ describe("socket.io-parser", () => {
         resolve();
       });
 
-      decoder.add('51-["hello"]');
+      decoder.add('51-[[1],"goodbye"]');
       decoder.destroy();
-      decoder.add('2["hello"]');
+      decoder.add('2[[1],"hello"]');
     });
   });
 

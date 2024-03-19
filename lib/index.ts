@@ -1,7 +1,8 @@
-import { Emitter } from "@socket.io/component-emitter";
-import { deconstructPacket, reconstructPacket } from "./binary.js";
-import { isBinary, hasBinary } from "./is-binary.js";
+import {Emitter} from "@socket.io/component-emitter";
+import {deconstructPacket, reconstructPacket} from "./binary.js";
+import {hasBinary, isBinary} from "./is-binary.js";
 import debugModule from "debug"; // debug()
+import * as devalue from "devalue";
 
 const debug = debugModule("socket.io-parser"); // debug()
 
@@ -51,9 +52,10 @@ export class Encoder {
   /**
    * Encoder constructor
    *
-   * @param {function} replacer - custom replacer to pass down to JSON.parse
+   * @param {Object} reducers - custom reducers to pass down to `devalue.stringify`
    */
-  constructor(private replacer?: (this: any, key: string, value: any) => any) {}
+  constructor(private reducers?: Record<string, (value: any) => any>) {}
+
   /**
    * Encode a packet as a single string if non-binary, or as a
    * buffer sequence, depending on packet type.
@@ -108,7 +110,7 @@ export class Encoder {
 
     // json data
     if (null != obj.data) {
-      str += JSON.stringify(obj.data, this.replacer);
+      str += devalue.stringify(obj.data, this.reducers);
     }
 
     debug("encoded %j as %s", obj, str);
@@ -146,9 +148,9 @@ export class Decoder extends Emitter<{}, {}, DecoderReservedEvents> {
   /**
    * Decoder constructor
    *
-   * @param {function} reviver - custom reviver to pass down to JSON.stringify
+   * @param {function} revivers - custom reviver to pass down to `devalue.parse`
    */
-  constructor(private reviver?: (this: any, key: string, value: any) => any) {
+  constructor(private revivers?: Record<string, (value: any) => any>) {
     super();
   }
 
@@ -157,7 +159,6 @@ export class Decoder extends Emitter<{}, {}, DecoderReservedEvents> {
    *
    * @param {String} obj - encoded packet
    */
-
   public add(obj: any) {
     let packet;
     if (typeof obj === "string") {
@@ -271,7 +272,7 @@ export class Decoder extends Emitter<{}, {}, DecoderReservedEvents> {
 
   private tryParse(str) {
     try {
-      return JSON.parse(str, this.reviver);
+      return devalue.parse(str, this.revivers);
     } catch (e) {
       return false;
     }

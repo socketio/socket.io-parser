@@ -1,20 +1,12 @@
 
 # socket.io-parser
 
-[![Build Status](https://github.com/socketio/socket.io-parser/workflows/CI/badge.svg)](https://github.com/socketio/socket.io-parser/actions)
-[![NPM version](https://badge.fury.io/js/socket.io-parser.svg)](http://badge.fury.io/js/socket.io-parser)
+[![Build Status](https://github.com/socketio/socket.io-devalue-parser/workflows/CI/badge.svg)](https://github.com/socketio/socket.io-devalue-parser/actions)
 
-A socket.io encoder and decoder written in JavaScript complying with version `5`
-of [socket.io-protocol](https://github.com/socketio/socket.io-protocol).
-Used by [socket.io](https://github.com/automattic/socket.io) and
-[socket.io-client](https://github.com/automattic/socket.io-client).
-
-Compatibility table:
-
-| Parser version | Socket.IO server version | Protocol revision |
-|----------------| ------------------------ | ----------------- |
-| 3.x            | 1.x / 2.x                | 4                 |
-| 4.x            | 3.x                      | 5                 |
+A fork of the default socket.io encoder and decoder, which uses
+[devalue](https://github.com/Rich-Harris/devalue) over the vanilla
+[JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON) object,
+for stringifying and parsing JavaScript objects.
 
 
 ## Parser API
@@ -28,7 +20,7 @@ Compatibility table:
 ### Encoding and decoding a packet
 
 ```js
-var parser = require('socket.io-parser');
+var parser = require('socket.io-devalue-parser');
 var encoder = new parser.Encoder();
 var packet = {
   type: parser.EVENT,
@@ -52,7 +44,7 @@ encoder.encode(packet, function(encodedPackets) {
 ### Encoding and decoding a packet with binary data
 
 ```js
-var parser = require('socket.io-parser');
+var parser = require('socket.io-devalue-parser');
 var encoder = new parser.Encoder();
 var packet = {
   type: parser.BINARY_EVENT,
@@ -73,7 +65,7 @@ encoder.encode(packet, function(encodedPackets) {
   }
 });
 ```
-See the test suite for more examples of how socket.io-parser is used.
+See the test suite for more examples of how socket.io-devalue-parser is used.
 
 
 ## License

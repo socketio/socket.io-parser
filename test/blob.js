@@ -1,5 +1,5 @@
-const { PacketType } = require("..");
-const helpers = require("./helpers.js");
+import {PacketType} from "../build/esm/index.js";
+import * as helpers from "./helpers.js";
 
 const BlobBuilderImpl =
   typeof BlobBuilder !== "undefined"

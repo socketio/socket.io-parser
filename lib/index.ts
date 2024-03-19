@@ -52,7 +52,7 @@ export class Encoder {
   /**
    * Encoder constructor
    *
-   * @param {Object} reducers - custom reducers to pass down to `devalue.stringify`
+   * @param {Object?} reducers - custom reducers to pass down to `devalue.stringify`
    */
   constructor(private reducers?: Record<string, (value: any) => any>) {}
 
@@ -148,7 +148,7 @@ export class Decoder extends Emitter<{}, {}, DecoderReservedEvents> {
   /**
    * Decoder constructor
    *
-   * @param {function} revivers - custom reviver to pass down to `devalue.parse`
+   * @param {function?} revivers - custom reviver to pass down to `devalue.parse`
    */
   constructor(private revivers?: Record<string, (value: any) => any>) {
     super();

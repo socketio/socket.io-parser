@@ -1,9 +1,10 @@
-const parser = require("..");
-const expect = require("expect.js");
+import * as parser from "../build/esm/index.js"
+import expect from "expect.js"
+
 const encoder = new parser.Encoder();
 
 // tests encoding and decoding a single packet
-module.exports.test = (obj) => {
+const test = (obj) => {
   return new Promise((resolve) => {
     const encodedPackets = encoder.encode(obj);
 
@@ -18,7 +19,7 @@ module.exports.test = (obj) => {
 };
 
 // tests encoding of binary packets
-module.exports.test_bin = (obj) => {
+const test_bin = (obj) => {
   return new Promise((resolve) => {
     const encodedPackets = encoder.encode(obj);
 
@@ -33,3 +34,5 @@ module.exports.test_bin = (obj) => {
     }
   });
 };
+
+export { test, test_bin }

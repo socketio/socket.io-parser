@@ -1,4 +1,4 @@
-const env = require("./support/env.js");
+import * as env from "./support/env.js";
 
 const blobSupported = (function () {
   try {
@@ -26,16 +26,16 @@ const blobBuilderSupported =
   !!BlobBuilderImpl.prototype.append &&
   !!BlobBuilderImpl.prototype.getBlob;
 
-require("./parser.js");
+await import("./parser.js");
 
 if (!env.browser) {
-  require("./buffer.js");
+  await import("./buffer.js");
 }
 
 if (typeof ArrayBuffer !== "undefined") {
-  require("./arraybuffer.js");
+  await import("./arraybuffer.js");
 }
 
 if (blobSupported || blobBuilderSupported) {
-  require("./blob.js");
+  await import("./blob.js");
 }

@@ -1,6 +1,7 @@
-const { PacketType, Decoder, Encoder } = require("..");
-const expect = require("expect.js");
-const helpers = require("./helpers.js");
+import {Encoder, PacketType} from "../build/esm/index.js";
+import expect from "expect.js";
+import * as helpers from "./helpers.js";
+
 const encoder = new Encoder();
 
 describe("ArrayBuffer", () => {

@@ -1,6 +1,6 @@
-const { PacketType, Decoder, Encoder, isPacketValid } = require("..");
-const expect = require("expect.js");
-const helpers = require("./helpers.js");
+import {Decoder, Encoder, isPacketValid, PacketType} from "../build/esm/index.js";
+import expect from "expect.js";
+import * as helpers from "./helpers.js";
 
 describe("socket.io-parser", () => {
   it("exposes types", () => {

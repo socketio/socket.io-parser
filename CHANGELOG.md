@@ -1,3 +1,12 @@
+## [3.3.4](https://github.com/Automattic/socket.io-parser/compare/3.3.3...3.3.4) (2024-07-22)
+
+
+### Bug Fixes
+
+* check the format of the event name ([#125](https://github.com/Automattic/socket.io-parser/issues/125)) ([ee00660](https://github.com/Automattic/socket.io-parser/commit/ee006607495eca4ec7262ad080dd3a91439a5ba4))
+
+
+
 ## [3.3.3](https://github.com/Automattic/socket.io-parser/compare/3.3.2...3.3.3) (2022-11-09)
 
 

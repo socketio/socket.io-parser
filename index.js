@@ -268,6 +268,26 @@ Decoder.prototype.add = function(obj) {
   }
 };
 
+function isPayloadValid(type, payload) {
+  switch (type) {
+    case 0: // CONNECT
+      return typeof payload === "object";
+    case 1: // DISCONNECT
+      return payload === undefined;
+    case 4: // ERROR
+      return typeof payload === "string" || typeof payload === "object";
+    case 2: // EVENT
+    case 5: // BINARY_EVENT
+      return (
+        isArray(payload) &&
+        (typeof payload[0] === "string" || typeof payload[0] === "number")
+      );
+    case 3: // ACK
+    case 6: // BINARY_ACK
+      return isArray(payload);
+  }
+}
+
 /**
  * Decode a packet String (JSON data)
  *
@@ -329,11 +349,10 @@ function decodeString(str) {
   // look up json data
   if (str.charAt(++i)) {
     var payload = tryParse(str.substr(i));
-    var isPayloadValid = payload !== false && (p.type === exports.ERROR || isArray(payload));
-    if (isPayloadValid) {
+    if (isPayloadValid(p.type, payload)) {
       p.data = payload;
     } else {
-      return error('invalid payload');
+      throw new Error("invalid payload");
     }
   }
 

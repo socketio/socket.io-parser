@@ -86,12 +86,20 @@ describe('parser', function(){
     }
   });
 
-  it('returns an error packet on parsing error', function(done){
-    var decoder = new parser.Decoder();
-    decoder.on('decoded', function(packet) {
-      expect(packet).to.eql({ type: 4, data: 'parser error: invalid payload' });
-      done();
-    });
-    decoder.add('442["some","data"');
+  it('returns an error packet on parsing error', function(){
+    function isInvalidPayload (str) {
+      expect(function () {
+        new parser.Decoder().add(str)
+      }).to.throwException(/^invalid payload$/);
+    }
+
+    isInvalidPayload('442["some","data"');
+    isInvalidPayload('0/admin,"invalid"');
+    isInvalidPayload("1/admin,{}");
+    isInvalidPayload('2/admin,"invalid');
+    isInvalidPayload("2/admin,{}");
+    isInvalidPayload('2[{"toString":"foo"}]');
+    isInvalidPayload('2[true,"foo"]');
+    isInvalidPayload('2[null,"bar"]');
   });
 });
